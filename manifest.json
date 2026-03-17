@@ -1,0 +1,14 @@
+{
+  "name": "Papiloscopista PC-PR",
+  "short_name": "Papiloscopista",
+  "description": "Estudos para o concurso de Papiloscopista PC-PR — Sistema Antifrágil",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0a1628",
+  "theme_color": "#c9a84c",
+  "orientation": "portrait-primary",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

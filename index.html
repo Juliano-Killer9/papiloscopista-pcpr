@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#c9a84c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Papiloscopista">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Papiloscopista PC-PR</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --azul:#0a1628;--azul2:#102040;--azul3:#0c1c35;
+  --dourado:#c9a84c;--dourado2:#e8c96e;
+  --branco:#eeeae0;--cinza:#8a8f9a;
+  --verde:#2ecc71;--vermelho:#e74c3c;--amarelo:#f39c12;
+  --bottom-h:64px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:var(--azul);color:var(--branco);font-family:'DM Sans',sans-serif;overflow:hidden;}
+
+/* ── TOPBAR ── */
+.topbar{
+  height:56px;background:linear-gradient(135deg,#0a1628,#0d1f3c,#162a4e);
+  border-bottom:2px solid var(--dourado);
+  display:flex;align-items:center;padding:0 16px;gap:12px;
+  position:relative;overflow:hidden;flex-shrink:0;
+}
+.topbar::after{content:'';position:absolute;top:-40px;right:-40px;width:160px;height:160px;background:radial-gradient(circle,rgba(201,168,76,.18) 0%,transparent 70%);border-radius:50%;}
+.logo{width:32px;height:32px;background:linear-gradient(135deg,var(--dourado),var(--dourado2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;box-shadow:0 0 12px rgba(201,168,76,.5);flex-shrink:0;}
+.topbar h1{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:2.5px;color:var(--dourado2);line-height:1;}
+.topbar-sub{font-size:.62rem;color:var(--cinza);letter-spacing:.8px;text-transform:uppercase;}
+.af-pill{margin-left:auto;background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.35);border-radius:20px;padding:3px 10px;font-size:.62rem;color:var(--dourado2);white-space:nowrap;}
+
+/* ── LAYOUT ── */
+.app{display:flex;flex-direction:column;height:100%;}
+.content{flex:1;overflow-y:auto;padding:16px;padding-bottom:calc(var(--bottom-h) + 12px);}
+.page{display:none;}.page.active{display:block;}
+
+/* ── BOTTOM NAV ── */
+.bottom-nav{
+  height:var(--bottom-h);background:var(--azul3);
+  border-top:1px solid rgba(201,168,76,.2);
+  display:flex;align-items:center;justify-content:space-around;
+  flex-shrink:0;position:relative;z-index:10;
+}
+.bn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 12px;cursor:pointer;border-radius:10px;transition:all .18s;border:none;background:transparent;flex:1;}
+.bn .bn-icon{font-size:1.3rem;line-height:1;}
+.bn .bn-label{font-size:.6rem;color:var(--cinza);text-transform:uppercase;letter-spacing:.5px;transition:color .18s;}
+.bn.active .bn-label{color:var(--dourado2);}
+.bn.active{background:rgba(201,168,76,.08);}
+.bn-dot{width:4px;height:4px;border-radius:50%;background:var(--dourado);margin-top:2px;opacity:0;}
+.bn.active .bn-dot{opacity:1;}
+
+/* ── TYPOGRAPHY ── */
+.page-title{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2.5px;color:var(--dourado2);margin-bottom:3px;}
+.page-sub{font-size:.78rem;color:var(--cinza);margin-bottom:18px;line-height:1.5;}
+
+/* ── CARDS ── */
+.card{background:var(--azul2);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:16px;margin-bottom:12px;}
+.card-gold{border-color:rgba(201,168,76,.25);background:linear-gradient(135deg,rgba(201,168,76,.07),var(--azul2));}
+.card-title{font-size:.75rem;color:var(--dourado2);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
+
+/* ── DASHBOARD ── */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.stat{background:var(--azul2);border:1px solid rgba(255,255,255,.07);border-radius:11px;padding:14px;text-align:center;}
+.stat-n{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;line-height:1;}
+.stat-l{font-size:.65rem;color:var(--cinza);text-transform:uppercase;letter-spacing:.8px;margin-top:2px;}
+.sv{color:var(--verde);}.sr{color:var(--vermelho);}.sd{color:var(--dourado2);}
+
+.fraqueza-item{display:flex;align-items:center;gap:8px;padding:10px 12px;background:rgba(231,76,60,.07);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin-bottom:7px;}
+.fraqueza-item.forte{background:rgba(46,204,113,.07);border-color:rgba(46,204,113,.2);}
+.fq-cat{font-size:.78rem;font-weight:600;flex:1;}
+.fq-bar-w{flex:2;height:4px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden;}
+.fq-bar{height:100%;border-radius:4px;}
+.fq-bar-r{background:linear-gradient(90deg,#e74c3c,#c0392b);}
+.fq-bar-v{background:linear-gradient(90deg,#2ecc71,#27ae60);}
+.fq-pct{font-family:'DM Mono',monospace;font-size:.72rem;min-width:32px;text-align:right;}
+.fq-pct-r{color:var(--vermelho);}.fq-pct-v{color:var(--verde);}
+
+.rec-box{background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.25);border-radius:10px;padding:12px 14px;margin-top:12px;}
+.rec-title{color:var(--dourado2);font-size:.73rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.rec-txt{font-size:.8rem;color:#b8c0d0;line-height:1.6;}
+
+/* ── PLANO ── */
+.rotina-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:14px;}
+.dia{background:var(--azul2);border:1px solid rgba(255,255,255,.07);border-radius:7px;padding:7px 3px;text-align:center;}
+.dia.dest{border-color:rgba(201,168,76,.4);background:linear-gradient(160deg,rgba(201,168,76,.08),var(--azul2));}
+.dia-n{font-family:'Bebas Neue',sans-serif;font-size:.72rem;letter-spacing:1.5px;color:var(--dourado);margin-bottom:3px;}
+.dia-s{font-size:.58rem;color:#7a8090;line-height:1.4;}
+.dia-s b{display:block;font-size:.62rem;}
+.dia-l{font-size:.6rem;color:var(--verde);font-weight:600;margin-top:3px;}
+
+.semana-card{background:var(--azul2);border:1px solid rgba(201,168,76,.15);border-radius:10px;padding:14px;margin-bottom:10px;}
+.sn{font-family:'Bebas Neue',sans-serif;font-size:.72rem;letter-spacing:2px;color:var(--dourado);margin-bottom:4px;}
+.semana-card h3{font-size:.88rem;font-weight:600;margin-bottom:7px;}
+.semana-card ul{list-style:none;display:flex;flex-direction:column;gap:4px;}
+.semana-card ul li{font-size:.76rem;color:#a0a8b8;display:flex;align-items:center;gap:5px;}
+.semana-card ul li::before{content:'▸';color:var(--dourado);font-size:.6rem;flex-shrink:0;}
+.tag{display:inline-block;padding:1px 6px;border-radius:20px;font-size:.6rem;font-family:'DM Mono',monospace;margin-left:auto;flex-shrink:0;}
+.ta{background:rgba(231,76,60,.2);color:#e74c3c;}
+.tm{background:rgba(243,156,18,.2);color:#f39c12;}
+.tl{background:rgba(100,149,237,.25);color:#8ab4f8;}
+
+/* ── SIMULADO ── */
+.filtros{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px;}
+.fb{padding:5px 12px;border-radius:20px;font-size:.72rem;font-weight:500;cursor:pointer;border:1px solid rgba(201,168,76,.3);background:transparent;color:var(--cinza);transition:all .18s;font-family:'DM Sans',sans-serif;}
+.fb.active{background:var(--dourado);color:var(--azul);border-color:var(--dourado);}
+
+.af-info{background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.25);border-radius:9px;padding:10px 13px;margin-bottom:14px;font-size:.76rem;color:#b8c0d0;display:flex;align-items:flex-start;gap:8px;line-height:1.5;}
+
+.placar-mini{display:flex;gap:10px;background:var(--azul2);border:1px solid rgba(201,168,76,.2);border-radius:9px;padding:10px 14px;margin-bottom:14px;align-items:center;}
+.pm-item{text-align:center;}
+.pm-n{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;line-height:1;}
+.pm-l{font-size:.6rem;text-transform:uppercase;letter-spacing:.8px;color:var(--cinza);}
+.pm-bar{flex:1;height:5px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden;}
+.pm-bar-i{height:100%;background:linear-gradient(90deg,var(--dourado),var(--dourado2));border-radius:4px;transition:width .4s;}
+.pm-pct{font-size:.8rem;color:var(--dourado2);min-width:32px;text-align:right;}
+
+.qcard{background:var(--azul2);border:1px solid rgba(255,255,255,.07);border-radius:11px;padding:16px;margin-bottom:12px;transition:border-color .2s;}
+.qcard.ok{border-color:rgba(46,204,113,.45);}
+.qcard.nok{border-color:rgba(231,76,60,.4);}
+.qmeta{display:flex;gap:6px;align-items:center;margin-bottom:9px;flex-wrap:wrap;}
+.qnum{font-family:'DM Mono',monospace;font-size:.66rem;color:var(--dourado);background:rgba(201,168,76,.1);padding:2px 7px;border-radius:4px;}
+.qcat{font-size:.64rem;color:var(--cinza);text-transform:uppercase;letter-spacing:.4px;}
+.qdif{font-size:.62rem;padding:1px 6px;border-radius:10px;font-family:'DM Mono',monospace;}
+.qdif.facil{background:rgba(46,204,113,.15);color:#2ecc71;}
+.qdif.medio{background:rgba(243,156,18,.15);color:#f39c12;}
+.qdif.dificil{background:rgba(231,76,60,.15);color:#e74c3c;}
+.qerros{font-size:.64rem;font-family:'DM Mono',monospace;}
+.qerros.alto{color:var(--vermelho);}.qerros.medio{color:var(--amarelo);}.qerros.zero{color:var(--verde);}
+.qtext{font-size:.86rem;line-height:1.65;margin-bottom:12px;color:#d0d8e8;}
+.opts{display:flex;flex-direction:column;gap:6px;}
+.opt{display:flex;align-items:flex-start;gap:9px;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.08);cursor:pointer;transition:all .18s;background:transparent;text-align:left;color:var(--branco);font-size:.82rem;line-height:1.5;font-family:'DM Sans',sans-serif;width:100%;}
+.opt:active:not(:disabled){border-color:var(--dourado);background:rgba(201,168,76,.08);}
+.opt.sel{border-color:var(--dourado);background:rgba(201,168,76,.1);}
+.opt.cr{border-color:var(--verde);background:rgba(46,204,113,.1);}
+.opt.er{border-color:var(--vermelho);background:rgba(231,76,60,.09);}
+.opt:disabled{cursor:default;}
+.letra{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--dourado);min-width:14px;flex-shrink:0;}
+.btnok{margin-top:10px;padding:10px 22px;background:linear-gradient(135deg,var(--dourado),var(--dourado2));color:var(--azul);border:none;border-radius:8px;font-weight:600;font-size:.84rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .2s;width:100%;}
+.btnok:disabled{opacity:.35;cursor:default;}
+.gab{margin-top:10px;padding:11px 13px;border-radius:8px;font-size:.79rem;line-height:1.6;display:none;}
+.gab.show{display:block;}
+.gab.gok{background:rgba(46,204,113,.09);border:1px solid rgba(46,204,113,.3);}
+.gab.gnok{background:rgba(231,76,60,.09);border:1px solid rgba(231,76,60,.3);}
+.gab strong{display:block;margin-bottom:4px;font-size:.86rem;}
+.gab.gok strong{color:var(--verde);}.gab.gnok strong{color:var(--vermelho);}
+
+/* ── TEORIA ── */
+.top{background:var(--azul2);border:1px solid rgba(255,255,255,.07);border-radius:10px;margin-bottom:8px;overflow:hidden;}
+.top-h{display:flex;align-items:center;justify-content:space-between;padding:13px 15px;cursor:pointer;}
+.top-t{font-weight:600;font-size:.86rem;display:flex;align-items:center;gap:9px;}
+.tico{width:26px;height:26px;border-radius:6px;background:linear-gradient(135deg,var(--dourado),var(--dourado2));display:flex;align-items:center;justify-content:center;font-size:.78rem;color:var(--azul);flex-shrink:0;}
+.tseta{color:var(--cinza);transition:transform .2s;font-size:.7rem;}
+.top.open .tseta{transform:rotate(180deg);}
+.top-b{display:none;padding:0 15px 14px;font-size:.8rem;line-height:1.75;color:#a8b2c4;border-top:1px solid rgba(255,255,255,.06);}
+.top.open .top-b{display:block;padding-top:12px;}
+.top-b h5{color:var(--dourado2);font-size:.74rem;text-transform:uppercase;letter-spacing:1px;margin:10px 0 5px;}
+.top-b ul{list-style:none;display:flex;flex-direction:column;gap:4px;padding-left:6px;}
+.top-b ul li::before{content:'◆ ';color:var(--dourado);font-size:.48rem;vertical-align:middle;}
+.top-b p{margin-bottom:6px;}
+.dest-box{background:rgba(201,168,76,.1);border-left:3px solid var(--dourado);padding:8px 11px;border-radius:0 6px 6px 0;margin:8px 0;color:var(--branco);font-size:.79rem;}
+.top-b table{width:100%;border-collapse:collapse;margin:7px 0;font-size:.76rem;}
+.top-b table th{background:rgba(201,168,76,.15);color:var(--dourado2);padding:5px 8px;text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:.4px;}
+.top-b table td{padding:5px 8px;border-bottom:1px solid rgba(255,255,255,.05);}
+.top-b table tr:last-child td{border-bottom:none;}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(201,168,76,.3);border-radius:2px;}
+
+/* ── INSTALL BANNER ── */
+.install-banner{background:linear-gradient(135deg,rgba(201,168,76,.15),rgba(201,168,76,.05));border:1px solid rgba(201,168,76,.35);border-radius:11px;padding:13px 15px;margin-bottom:14px;display:flex;align-items:center;gap:10px;cursor:pointer;}
+.install-banner.hidden{display:none;}
+.ib-text{flex:1;font-size:.78rem;color:#c8d0e0;line-height:1.5;}
+.ib-text strong{color:var(--dourado2);display:block;margin-bottom:2px;}
+.ib-btn{background:var(--dourado);color:var(--azul);border:none;border-radius:7px;padding:7px 12px;font-size:.76rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo">🔍</div>
+  <div>
+    <h1>Papiloscopista PC-PR</h1>
+    <div class="topbar-sub">Concurso 2026</div>
+  </div>
+  <div class="af-pill">⚡ Antifrágil</div>
+</div>
+
+<!-- CONTENT -->
+<div class="content" id="content">
+
+  <!-- DASHBOARD -->
+  <div class="page active" id="page-dashboard">
+    <div class="page-title">Dashboard</div>
+    <p class="page-sub">Seu desempenho em tempo real. O sistema antifrágil te diz onde focar.</p>
+
+    <div id="install-banner" class="install-banner hidden">
+      <div class="ib-text"><strong>📲 Instalar App</strong>Adicione à tela inicial para usar offline</div>
+      <button class="ib-btn" onclick="instalarApp()">Instalar</button>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat"><div class="stat-n sd" id="d-t">0</div><div class="stat-l">Respondidas</div></div>
+      <div class="stat"><div class="stat-n sv" id="d-c">0</div><div class="stat-l">Corretas</div></div>
+      <div class="stat"><div class="stat-n sr" id="d-e">0</div><div class="stat-l">Erradas</div></div>
+      <div class="stat"><div class="stat-n sd" id="d-p">0%</div><div class="stat-l">Aproveitamento</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🔴 Fraquezas — Prioridade Antifrágil</div>
+      <div id="fq-list"><div style="font-size:.78rem;color:var(--cinza)">Responda questões para ver sua análise.</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">✅ Pontos Fortes</div>
+      <div id="ft-list"><div style="font-size:.78rem;color:var(--cinza)">Responda questões para ver seus pontos fortes.</div></div>
+    </div>
+
+    <div class="rec-box" id="rec-box" style="display:none">
+      <div class="rec-title">⚡ Recomendação Antifrágil</div>
+      <div class="rec-txt" id="rec-txt"></div>
+    </div>
+  </div>
+
+  <!-- SIMULADO -->
+  <div class="page" id="page-simulado">
+    <div class="page-title">Simulado</div>
+    <p class="page-sub">Responda antes de ler a teoria — o erro potencializa a fixação.</p>
+
+    <div class="af-info">
+      <span>⚡</span>
+      <div>Questões que você erra sobem para o topo automaticamente. Papiloscopia tem volume maior — é o diferencial do cargo.</div>
+    </div>
+
+    <div class="filtros">
+      <button class="fb active" onclick="filtrar('todas',this)">Todas</button>
+      <button class="fb" onclick="filtrar('papiloscopia',this)">🔎 Papiloscopia</button>
+      <button class="fb" onclick="filtrar('penal',this)">Penal</button>
+      <button class="fb" onclick="filtrar('processual',this)">Proc. Penal</button>
+      <button class="fb" onclick="filtrar('constitucional',this)">Constitucional</button>
+      <button class="fb" onclick="filtrar('administrativo',this)">Dir. Adm.</button>
+      <button class="fb" onclick="filtrar('legislacao',this)">Legislação</button>
+      <button class="fb" onclick="filtrar('portugues',this)">Português</button>
+    </div>
+
+    <div class="placar-mini">
+      <div class="pm-item"><div class="pm-n sd" id="pt">0</div><div class="pm-l">Resp.</div></div>
+      <div class="pm-item"><div class="pm-n sv" id="pc">0</div><div class="pm-l">Certas</div></div>
+      <div class="pm-item"><div class="pm-n sr" id="pe">0</div><div class="pm-l">Erradas</div></div>
+      <div class="pm-bar"><div class="pm-bar-i" id="pb" style="width:0%"></div></div>
+      <div class="pm-pct" id="pp">0%</div>
+    </div>
+
+    <div id="qcontainer"></div>
+  </div>
+
+  <!-- TEORIA -->
+  <div class="page" id="page-teoria">
+    <div class="page-title">Resumo Teórico</div>
+    <p class="page-sub">Use após errar nas questões. Toque para expandir.</p>
+    <div id="tcontainer"></div>
+  </div>
+
+  <!-- PLANO -->
+  <div class="page" id="page-plano">
+    <div class="page-title">Plano de Estudos</div>
+    <p class="page-sub">Adaptado à sua rotina: Itaú + duas faculdades + 4 livros. Sistema antifrágil aplicado.</p>
+
+    <div class="card card-gold">
+      <div class="card-title">📅 Grade Semanal</div>
+      <div class="rotina-grid">
+        <div class="dia"><div class="dia-n">SEG</div><div class="dia-s"><b style="color:#e74c3c">Itaú</b></div><div class="dia-l">2h noite</div></div>
+        <div class="dia"><div class="dia-n">TER</div><div class="dia-s"><b style="color:#e74c3c">Itaú</b><b style="color:#f39c12">Eco</b></div></div>
+        <div class="dia"><div class="dia-n">QUA</div><div class="dia-s"><b style="color:#e74c3c">Itaú</b><b style="color:#f39c12">Eco</b></div></div>
+        <div class="dia"><div class="dia-n">QUI</div><div class="dia-s"><b style="color:#e74c3c">Itaú</b><b style="color:#f39c12">Eco</b></div></div>
+        <div class="dia"><div class="dia-n">SEX</div><div class="dia-s"><b style="color:#e74c3c">Itaú</b></div><div class="dia-l">2h noite</div></div>
+        <div class="dia dest"><div class="dia-n">SÁB</div><div class="dia-l">4–5h bloco</div></div>
+        <div class="dia dest"><div class="dia-n">DOM</div><div class="dia-l">Leitura & rev.</div></div>
+      </div>
+    </div>
+
+    <div class="card card-gold">
+      <div class="card-title">⚡ Sistema Antifrágil Aplicado</div>
+      <div style="font-size:.8rem;color:#b8c0d0;line-height:1.65">
+        <p><strong style="color:var(--dourado2)">Questões antes da teoria:</strong> sempre resolva primeiro, depois leia a explicação. O erro cria ancoragem cognitiva.</p>
+        <p style="margin-top:7px"><strong style="color:var(--dourado2)">Dashboard rastreia seus erros</strong> e recomenda onde focar. O que você domina, estuda menos. O que erra, estuda mais.</p>
+        <p style="margin-top:7px"><strong style="color:var(--dourado2)">Sinergia polimata:</strong> Perícia Papiloscópica = estudo duplo (pesquisa + concurso). Taleb = raciocínio probabilístico aplicado à interpretação de evidências.</p>
+      </div>
+    </div>
+
+    <div class="semana-card"><div class="sn">SEMANA 1–2 · SEG/SEX</div><h3>⚖️ Direito Penal</h3><ul>
+      <li>Teoria geral do crime <span class="tag ta">ALTO</span></li>
+      <li>Dolo, culpa, preterdolo</li>
+      <li>Excludentes de ilicitude <span class="tag ta">ALTO</span></li>
+      <li>Crimes contra a pessoa e patrimônio <span class="tag tm">MÉD</span></li>
+    </ul></div>
+    <div class="semana-card"><div class="sn">SEMANA 3–4 · SEG/SEX</div><h3>🏛️ Processo Penal</h3><ul>
+      <li>Inquérito policial <span class="tag ta">ALTO</span></li>
+      <li>Prisão em flagrante <span class="tag ta">ALTO</span></li>
+      <li>Prisão preventiva e temporária</li>
+      <li>Provas em geral <span class="tag tm">MÉD</span></li>
+    </ul></div>
+    <div class="semana-card"><div class="sn">DOMINGO CONTÍNUO</div><h3>📖 Leitura da Pesquisa</h3><ul>
+      <li>Perícia Papiloscópica <span class="tag tl">PESQUISA</span></li>
+      <li>Serial Killers – Dark Side <span class="tag tl">PESQUISA</span></li>
+      <li>Iludidos pelo Acaso – Taleb <span class="tag tl">PESQUISA</span></li>
+      <li>4º livro eco comportamental <span class="tag tl">PESQUISA</span></li>
+    </ul></div>
+    <div class="semana-card"><div class="sn">SEMANA 5–6 · SEG/SEX</div><h3>🇧🇷 Constitucional & Adm.</h3><ul>
+      <li>Art. 144 – Segurança pública <span class="tag ta">ALTO</span></li>
+      <li>Direitos fundamentais Art. 5º <span class="tag ta">ALTO</span></li>
+      <li>Princípios LIMPE <span class="tag ta">ALTO</span></li>
+    </ul></div>
+    <div class="semana-card"><div class="sn">SEMANA 7–8 · SÁBADO</div><h3>🔎 Papiloscopia Específica</h3><ul>
+      <li>Sistema Vucetich A/I/E/V <span class="tag ta">ALTO</span></li>
+      <li>3 postulados + Princípio de Locard <span class="tag ta">ALTO</span></li>
+      <li>Revelação de vestígios por superfície <span class="tag ta">ALTO</span></li>
+      <li>Palmoscopia, quiroscopia, podoscopia <span class="tag tm">MÉD</span></li>
+      <li>Cadeia de custódia <span class="tag tm">MÉD</span></li>
+    </ul></div>
+    <div class="semana-card"><div class="sn">SEMANA 9–10 · SÁBADO</div><h3>🇵🇹 Português + Legislação</h3><ul>
+      <li>Interpretação de texto <span class="tag ta">ALTO</span></li>
+      <li>Redação dissertativa <span class="tag ta">ALTO</span></li>
+      <li>Lei Maria da Penha + Lei de Drogas <span class="tag ta">ALTO</span></li>
+    </ul></div>
+    <div class="semana-card"><div class="sn">SEMANA 11–12 · SÁB/DOM</div><h3>🔄 Revisão Antifrágil</h3><ul>
+      <li>Simulado completo 50 questões <span class="tag ta">ALTO</span></li>
+      <li>Foco nos erros do dashboard</li>
+      <li>Treino de redação dissertativa <span class="tag ta">ALTO</span></li>
+    </ul></div>
+  </div>
+
+</div><!-- /content -->
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <button class="bn active" onclick="navTo('dashboard',this)">
+    <span class="bn-icon">📊</span><span class="bn-label">Dashboard</span><div class="bn-dot"></div>
+  </button>
+  <button class="bn" onclick="navTo('simulado',this)">
+    <span class="bn-icon">✏️</span><span class="bn-label">Simulado</span><div class="bn-dot"></div>
+  </button>
+  <button class="bn" onclick="navTo('teoria',this)">
+    <span class="bn-icon">📚</span><span class="bn-label">Teoria</span><div class="bn-dot"></div>
+  </button>
+  <button class="bn" onclick="navTo('plano',this)">
+    <span class="bn-icon">📋</span><span class="bn-label">Plano</span><div class="bn-dot"></div>
+  </button>
+</div>
+
+</div><!-- /app -->
+
+<script>
+// ═══════════════════════════════
+// PWA: Service Worker + Install
+// ═══════════════════════════════
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(()=>{});
+}
+
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('install-banner').classList.remove('hidden');
+});
+
+function instalarApp() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(() => {
+    deferredPrompt = null;
+    document.getElementById('install-banner').classList.add('hidden');
+  });
+}
+
+// ═══════════════════════════════
+// QUESTÕES
+// ═══════════════════════════════
+const Q = [
+  {id:1,cat:'papiloscopia',dif:'facil',
+   txt:'O sistema de classificação papiloscópica adotado no Brasil é o de:',
+   ops:['Francis Galton','Juan Vucetich','Edward Henry','Alphonse Bertillon','Edmond Locard'],c:1,
+   com:'Brasil adota Vucetich (argentino): A=Arco, I=Presilha Interna, E=Presilha Externa, V=Verticilo. Henry = países anglófonos. Locard = Princípio da Troca.'},
+  {id:2,cat:'papiloscopia',dif:'facil',
+   txt:'No sistema Vucetich, "Verticilo" é representado pela letra:',
+   ops:['A','I','E','V','P'],c:3,
+   com:'A=Arco (0 delta) | I=Presilha Interna (1 delta, dir.) | E=Presilha Externa (1 delta, esq.) | V=Verticilo (2+ deltas). Macete: V de Volta.'},
+  {id:3,cat:'papiloscopia',dif:'facil',
+   txt:'Qual NÃO é um dos três postulados clássicos da papiloscopia?',
+   ops:['Imutabilidade','Perenidade','Diversiformidade','Mutabilidade','Classificabilidade'],c:3,
+   com:'Os 3 postulados: Imutabilidade (não mudam na vida), Perenidade (do feto até a decomposição), Diversiformidade (nunca duas iguais). MUTABILIDADE é o oposto.'},
+  {id:4,cat:'papiloscopia',dif:'medio',
+   txt:'Para revelar impressão latente em vidro (superfície não porosa), usa-se:',
+   ops:['Ninhidrina','DFO','Pó físico (alumínio/negro de fumo)','Vapores de iodo','Sulfato de cobre'],c:2,
+   com:'Não porosa seca → pós físicos. Alumínio em superfícies escuras; negro de fumo em claras. Ninhidrina e DFO = superfícies porosas (papel).'},
+  {id:5,cat:'papiloscopia',dif:'facil',
+   txt:'"Todo contato entre dois objetos deixa um traço." Esse princípio é de:',
+   ops:['Vucetich','Galton','Edmond Locard','Hans Gross','Bertillon'],c:2,
+   com:'Princípio de Locard (Troca) — criminologista francês Edmond Locard. Pilar da Criminalística moderna.'},
+  {id:6,cat:'papiloscopia',dif:'medio',
+   txt:'O estudo das impressões da palma da mão é chamado de:',
+   ops:['Datiloscopia','Quiroscopia','Palmoscopia','Podoscopia','Rugoscopia'],c:2,
+   com:'Datiloscopia = dedos | Palmoscopia = palma da mão | Podoscopia = pés | Rugoscopia = rugas palatinas.'},
+  {id:7,cat:'papiloscopia',dif:'medio',
+   txt:'O delta papiloscópico é:',
+   ops:['Linha em arco sem bifurcação.','Ponto central do verticilo.','Região triangular onde convergem três sistemas de linhas papilares.','Espaço entre dois tipos fundamentais.','A linha basilar dos tipos fundamentais.'],c:2,
+   com:'O delta é a região triangular formada pela convergência de 3 sistemas: nuclear (centro), basilar (abaixo) e marginal (lado). Arco=0 delta | Presilha=1 delta | Verticilo=2+ deltas.'},
+  {id:8,cat:'papiloscopia',dif:'medio',
+   txt:'Para superfície MOLHADA ou submersa, a técnica indicada para revelação de impressões latentes é:',
+   ops:['Ninhidrina','Pó de alumínio','Small Particle Reagent (SPR)','DFO','Vapores de cianoacrilato'],c:2,
+   com:'SPR (Small Particle Reagent) = superfícies molhadas ou submersas. Cianoacrilato = não porosas secas. Ninhidrina/DFO = papel. Pós físicos = não porosas secas.'},
+  {id:9,cat:'papiloscopia',dif:'medio',
+   txt:'A cadeia de custódia dos vestígios papiloscópicos tem por objetivo:',
+   ops:['Acelerar o processamento laboratorial.','Garantir integridade e rastreabilidade do vestígio desde a coleta até o laudo.','Classificar vestígios por importância.','Permitir manuseio livre por qualquer perito.','Reduzir custo da perícia.'],c:1,
+   com:'Art. 158-A CPP (Pacote Anticrime): cadeia de custódia garante integridade, autenticidade e rastreabilidade do vestígio. Etapas: reconhecimento → coleta → acondicionamento → transporte → processamento → descarte.'},
+  {id:10,cat:'papiloscopia',dif:'dificil',
+   txt:'A fórmula datiloscópica de Vucetich usa MAIÚSCULAS para os indicadores e minúsculas para os demais dedos. O tipo "i" indica:',
+   ops:['Arco','Presilha Interna','Presilha Externa','Verticilo','Tipo indefinido'],c:1,
+   com:'Na fórmula Vucetich: a=arco | i=presilha interna | e=presilha externa | v=verticilo (minúsculas para não-indicadores). MAIÚSCULAS A/I/E/V = dedos indicadores. A fórmula é escrita: MD numerador / MI denominador.'},
+  {id:11,cat:'processual',dif:'facil',
+   txt:'Sobre o inquérito policial, é CORRETO afirmar:',
+   ops:['É indispensável para a denúncia do MP.','Tem natureza jurisdicional.','É dispensável — MP pode agir por peças de informação.','Admite contraditório pleno.','Só pode ser instaurado de ofício.'],c:2,
+   com:'O IP é dispensável (art. 46 CPP). Natureza administrativa/inquisitorial, presidido pelo Delegado. Sem contraditório pleno.'},
+  {id:12,cat:'processual',dif:'facil',
+   txt:'Prazo do IP com indiciado PRESO:',
+   ops:['30 dias prorrogáveis.','15 dias prorrogável uma vez.','10 dias improrrogáveis.','5 dias improrrogáveis.','10 dias prorrogáveis por mais 10.'],c:2,
+   com:'Art. 10 CPP: 10 dias improrrogáveis (preso). Solto: 30 dias prorrogáveis. Lei de Drogas: 30 dias prorrogáveis por mais 30.'},
+  {id:13,cat:'processual',dif:'medio',
+   txt:'A prisão em flagrante por qualquer do povo é:',
+   ops:['Proibida.','Facultativa em qualquer modalidade.','Obrigatória igual a policiais.','Só no flagrante próprio.','Depende de autorização judicial.'],c:1,
+   com:'Art. 301 CPP: qualquer do povo PODERÁ (facultativo). Policiais DEVERÃO (obrigatório). Vale para todas as modalidades.'},
+  {id:14,cat:'penal',dif:'facil',
+   txt:'Age em LEGÍTIMA DEFESA quem:',
+   ops:['Usa moderadamente dos meios necessários para repelir injusta agressão, atual ou iminente, a direito seu ou de outrem.','Pratica fato para salvar direito próprio de perigo atual.','Age em estrito cumprimento de dever legal.','Age por ordem de superior.','Pratica fato em estado de necessidade presumido.'],c:0,
+   com:'Art. 25 CP: uso moderado dos meios necessários para repelir injusta agressão, atual ou iminente, a direito próprio ou alheio. Opção B = estado de necessidade (art. 24 CP).'},
+  {id:15,cat:'penal',dif:'medio',
+   txt:'Motorista assume risco e mata pedestre. Elemento subjetivo:',
+   ops:['Culpa inconsciente','Culpa consciente','Dolo direto','Dolo eventual','Preterdolo'],c:3,
+   com:'Dolo eventual: prevê e assume o risco (art. 18, I, parte final). Culpa consciente: prevê mas confia que não ocorre. Inconsciente: não prevê o previsível.'},
+  {id:16,cat:'constitucional',dif:'facil',
+   txt:'Às Polícias Civis incumbe (art. 144, §4º CF):',
+   ops:['Policiamento ostensivo.','Polícia judiciária e apuração de infrações penais, exceto militares.','Só crimes dolosos contra a vida.','Fronteiras e aeroportos.','Investigação federal.'],c:1,
+   com:'Art. 144, §4º CF: polícia judiciária + apuração de infrações penais (exceto militares). Policiamento ostensivo = PM (§5º).'},
+  {id:17,cat:'constitucional',dif:'medio',
+   txt:'A vedação de tribunal de exceção é o princípio do:',
+   ops:['Contraditório','Ampla defesa','Presunção de inocência','Juiz natural','Devido processo legal'],c:3,
+   com:'Art. 5º, XXXVII e LIII CF: princípio do Juiz Natural — competência preestabelecida + vedação de juízo de exceção.'},
+  {id:18,cat:'administrativo',dif:'facil',
+   txt:'O princípio que exige boa-fé e honestidade além da legalidade formal é o da:',
+   ops:['Legalidade','Impessoalidade','Moralidade','Publicidade','Eficiência'],c:2,
+   com:'Moralidade (M do LIMPE): ética, boa-fé, honestidade. Impessoalidade = igualdade/sem promoção pessoal. Publicidade = transparência.'},
+  {id:19,cat:'legislacao',dif:'facil',
+   txt:'Medidas que OBRIGAM O AGRESSOR na Lei Maria da Penha incluem:',
+   ops:['Só proibição de aproximação.','Suspensão do porte de armas, afastamento do lar, proibição de aproximação e contato.','Só afastamento do lar.','Prisão preventiva automática.','Pagamento de fiança.'],c:1,
+   com:'Art. 22 Lei 11.340/06: suspensão de armas, afastamento do lar, proibição de aproximação e contato, restrição de visitas, alimentos provisionais.'},
+  {id:20,cat:'portugues',dif:'medio',
+   txt:'Crase correta em TODAS as ocorrências:',
+   ops:['"Às pressas, ela foi à delegacia."','"Entregou o laudo à ele."','"Refere-se à vários aspectos."','"Dirigiu-se à São Paulo."','"À medida em que avançava."'],c:0,
+   com:'"Às pressas" = locução adverbial feminina. "À delegacia" = IR + prep. a + artigo a. B: pronome pessoal não aceita artigo. C: antes de indefinido masculino. D: cidade sem artigo. E: correto é "à medida que" (sem "em").'},
+];
+
+// ═══════════════════════════════
+// TEORIA
+// ═══════════════════════════════
+const TOPS = [
+  {icon:'🔎',title:'Papiloscopia — Sistema Vucetich',body:`
+<h5>Os 4 Tipos Fundamentais</h5>
+<table><tr><th>Letra</th><th>Nome</th><th>Deltas</th><th>Descrição</th></tr>
+<tr><td><b>A</b></td><td>Arco</td><td>0</td><td>Linhas em arco simples</td></tr>
+<tr><td><b>I</b></td><td>Presilha Interna</td><td>1 (direita)</td><td>Abertura para a direita</td></tr>
+<tr><td><b>E</b></td><td>Presilha Externa</td><td>1 (esquerda)</td><td>Abertura para a esquerda</td></tr>
+<tr><td><b>V</b></td><td>Verticilo</td><td>2+</td><td>Espiral ou círculo concêntrico</td></tr>
+</table>
+<div class="dest-box"><b>Macete A·I·E·V:</b> Arco = 0 delta | Interna = abre para dentro (dir.) | Externa = abre para fora (esq.) | Verticilo = 2 deltas</div>
+<h5>Fórmula Datiloscópica</h5>
+<p>Indicadores em MAIÚSCULAS; demais em minúsculas. MD no numerador, MI no denominador. Ex: <b>Vi/Iea</b></p>`},
+  {icon:'🧪',title:'Papiloscopia — Revelação de Vestígios',body:`
+<h5>Tipos de Impressões</h5>
+<ul>
+<li><b>Visíveis</b> — sangue, tinta, graxa</li>
+<li><b>Plásticas</b> — cera, argila, manteiga</li>
+<li><b>Latentes</b> — invisíveis, formadas pelo suor/gordura</li>
+</ul>
+<h5>Técnicas por Superfície</h5>
+<table><tr><th>Superfície</th><th>Técnica</th></tr>
+<tr><td>Não porosa seca (vidro, metal)</td><td>Pós físicos (alumínio, negro de fumo)</td></tr>
+<tr><td>Porosa (papel, papelão)</td><td>Ninhidrina, DFO, Nitrato de prata</td></tr>
+<tr><td>Molhada / submersa</td><td>Small Particle Reagent (SPR)</td></tr>
+<tr><td>Não porosa seca (alternativo)</td><td>Cianoacrilato (vapores)</td></tr>
+</table>
+<div class="dest-box">Regra: <b>porosa = reagente químico</b> (aminoácidos) | <b>não porosa = pó físico</b> (gorduras) | <b>molhada = SPR</b></div>`},
+  {icon:'📋',title:'Papiloscopia — Postulados e Locard',body:`
+<h5>Os 3 Postulados</h5>
+<ul>
+<li><b>Imutabilidade</b> — formam-se no feto (~6º mês) e não mudam na vida</li>
+<li><b>Perenidade</b> — persistem até a decomposição total</li>
+<li><b>Diversiformidade</b> — impossível duas impressões idênticas (nem gêmeos univitelinos)</li>
+</ul>
+<h5>Princípio de Locard</h5>
+<p>Edmond Locard (1877–1966): "Todo contato resulta em troca de material." Diretor do 1º laboratório de Criminalística do mundo (Lyon, 1910).</p>
+<h5>Cadeia de Custódia (art. 158-A CPP)</h5>
+<p>Reconhecimento → isolamento → fixação → coleta → acondicionamento → transporte → recebimento → processamento → armazenamento → descarte.</p>`},
+  {icon:'🖐️',title:'Papiloscopia — Ramos e Aplicações',body:`
+<h5>Ramos da Papiloscopia</h5>
+<ul>
+<li><b>Datiloscopia</b> — impressões dos dedos (principal na identificação criminal)</li>
+<li><b>Palmoscopia</b> — impressões da palma da mão</li>
+<li><b>Quiroscopia</b> — mão inteira (dedos + palma)</li>
+<li><b>Podoscopia</b> — impressões dos pés (recém-nascidos)</li>
+<li><b>Rugoscopia</b> — rugas palatinas (cadáveres carbonizados)</li>
+</ul>
+<div class="dest-box">Na prova: Palmoscopia ≠ Quiroscopia. Palmoscopia = só a palma. Quiroscopia = mão toda. Fique atento à distinção.</div>`},
+  {icon:'⚖️',title:'Direito Penal — Crime e Excludentes',body:`
+<h5>Conceito Analítico</h5>
+<ul>
+<li><b>Fato típico</b> — conduta + resultado + nexo + tipicidade</li>
+<li><b>Ilícito</b> — ausência de excludentes</li>
+<li><b>Culpável</b> — imputabilidade + potencial consciência + exigibilidade</li>
+</ul>
+<h5>Excludentes de Ilicitude (Art. 23 CP)</h5>
+<ul>
+<li><b>Estado de necessidade</b> — perigo atual, não provocado, bem menor sacrificado</li>
+<li><b>Legítima defesa</b> — injusta agressão atual/iminente, meios moderados</li>
+<li><b>Estrito cumprimento do dever legal</b></li>
+<li><b>Exercício regular de direito</b></li>
+</ul>
+<h5>Elemento Subjetivo</h5>
+<table><tr><th>Tipo</th><th>Prevê?</th><th>Aceita?</th></tr>
+<tr><td>Dolo direto</td><td>Sim</td><td>Quer o resultado</td></tr>
+<tr><td>Dolo eventual</td><td>Sim</td><td>Assume o risco</td></tr>
+<tr><td>Culpa consciente</td><td>Sim</td><td>Confia que não ocorre</td></tr>
+<tr><td>Culpa inconsciente</td><td>Não</td><td>Não prevê o previsível</td></tr>
+</table>`},
+  {icon:'🏛️',title:'Processo Penal — IP e Flagrante',body:`
+<h5>Inquérito Policial</h5>
+<ul>
+<li>Natureza <b>administrativa e inquisitorial</b></li>
+<li>Presidido pelo <b>Delegado de Polícia</b></li>
+<li><b>Dispensável</b> para a denúncia do MP</li>
+<li>Preso: <b>10 dias improrrogáveis</b></li>
+<li>Solto: <b>30 dias prorrogáveis</b></li>
+</ul>
+<h5>Flagrante (Art. 302 CPP)</h5>
+<table><tr><th>Tipo</th><th>Situação</th></tr>
+<tr><td>Próprio</td><td>Cometendo ou acabou de cometer</td></tr>
+<tr><td>Impróprio</td><td>Perseguido logo após</td></tr>
+<tr><td>Ficto</td><td>Encontrado logo depois com objetos</td></tr>
+</table>
+<div class="dest-box">Qualquer do povo <b>PODE</b> (facultativo). Polícia <b>DEVE</b> (obrigatório).</div>`},
+  {icon:'🏢',title:'Direito Administrativo — LIMPE',body:`
+<h5>Princípios (Art. 37 CF)</h5>
+<table><tr><th>Letra</th><th>Princípio</th><th>Resumo</th></tr>
+<tr><td><b>L</b></td><td>Legalidade</td><td>Só faz o que a lei autoriza</td></tr>
+<tr><td><b>I</b></td><td>Impessoalidade</td><td>Igualdade; sem promoção pessoal</td></tr>
+<tr><td><b>M</b></td><td>Moralidade</td><td>Ética e boa-fé além da lei</td></tr>
+<tr><td><b>P</b></td><td>Publicidade</td><td>Transparência dos atos</td></tr>
+<tr><td><b>E</b></td><td>Eficiência</td><td>Melhor resultado, menor custo</td></tr>
+</table>
+<div class="dest-box">Mais confundidas na prova: Moralidade (ética) vs Impessoalidade (igualdade) vs Legalidade (lei).</div>`},
+  {icon:'📜',title:'Lei Maria da Penha — Essencial',body:`
+<h5>Aspectos-chave</h5>
+<ul>
+<li>Violência doméstica contra <b>mulher</b> no âmbito familiar/afetivo</li>
+<li>Não se aplica aos Juizados Especiais (Súmula 536 STJ)</li>
+<li>Lesão corporal leve = ação penal <b>pública incondicionada</b></li>
+</ul>
+<h5>Medidas que Obrigam o Agressor (Art. 22)</h5>
+<ul>
+<li>Suspensão do porte de armas</li>
+<li>Afastamento do lar</li>
+<li>Proibição de aproximação (com distância mínima)</li>
+<li>Proibição de contato por qualquer meio</li>
+<li>Restrição de visitas aos dependentes</li>
+<li>Prestação de alimentos provisionais</li>
+</ul>
+<div class="dest-box">Prisão preventiva NÃO é automática — depende dos requisitos do CPP (art. 313).</div>`},
+];
+
+// ═══════════════════════════════
+// ESTADO
+// ═══════════════════════════════
+let resp = {};
+let errosCat = {};
+let filtroAtivo = 'todas';
+
+// ═══════════════════════════════
+// NAVEGAÇÃO
+// ═══════════════════════════════
+function navTo(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.bn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  btn.classList.add('active');
+  document.getElementById('content').scrollTop = 0;
+  if (id === 'teoria') renderT();
+  if (id === 'dashboard') renderDash();
+}
+
+// ═══════════════════════════════
+// SIMULADO
+// ═══════════════════════════════
+function filtrar(cat, btn) {
+  filtroAtivo = cat;
+  document.querySelectorAll('.fb').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderQ();
+}
+
+function renderQ() {
+  const c = document.getElementById('qcontainer');
+  let lista = filtroAtivo === 'todas' ? [...Q] : Q.filter(q => q.cat === filtroAtivo);
+
+  // Antifrágil: erradas → não respondidas → certas
+  const err = lista.filter(q => resp[q.id] && resp[q.id].ch !== resp[q.id].c);
+  const nr  = lista.filter(q => !resp[q.id]);
+  const ok  = lista.filter(q => resp[q.id] && resp[q.id].ch === resp[q.id].c);
+  lista = [...err, ...nr, ...ok];
+
+  c.innerHTML = '';
+  lista.forEach(q => {
+    const r = resp[q.id];
+    const done = r !== undefined;
+    const ec = errosCat[q.cat] || {e:0, t:0};
+    const taxaErr = ec.t > 0 ? Math.round((ec.e / ec.t) * 100) : 0;
+
+    const d = document.createElement('div');
+    d.className = 'qcard' + (done ? (r.ch === q.c ? ' ok' : ' nok') : '');
+    d.innerHTML = `
+      <div class="qmeta">
+        <span class="qnum">Q${q.id}</span>
+        <span class="qcat">${catL(q.cat)}</span>
+        <span class="qdif ${q.dif}">${q.dif.charAt(0).toUpperCase()+q.dif.slice(1)}</span>
+        ${ec.t > 0 ? `<span class="qerros ${taxaErr>=50?'alto':taxaErr>=25?'medio':'zero'}">⚡${taxaErr}%</span>` : ''}
+      </div>
+      <div class="qtext">${q.txt}</div>
+      <div class="opts">${q.ops.map((op,i) => {
+        let cl = 'opt';
+        if (done) { cl += ' '; if (i===q.c) cl+='cr'; else if (i===r.ch) cl+='er'; }
+        return `<button class="${cl}" onclick="selOpt(${q.id},${i})" ${done?'disabled':''}><span class="letra">${String.fromCharCode(65+i)}</span>${op}</button>`;
+      }).join('')}</div>
+      <button class="btnok" id="b${q.id}" onclick="conf(${q.id})" disabled>${done?'Respondida ✓':'Confirmar resposta'}</button>
+      <div class="gab ${done?(r.ch===q.c?'gok':'gnok'):''} ${done?'show':''}" id="g${q.id}">
+        <strong>${done?(r.ch===q.c?'✅ Correto!':'❌ Incorreto — Gabarito: '+String.fromCharCode(65+q.c)):''}</strong>${q.com}
+      </div>`;
+    c.appendChild(d);
+  });
+}
+
+function selOpt(qid, i) {
+  if (resp[qid] !== undefined) return;
+  Q.find(q=>q.id===qid).ops.forEach((_,j) => {
+    const b = document.querySelector(`[onclick="selOpt(${qid},${j})"]`);
+    if (b) b.classList.remove('sel');
+  });
+  const b = document.querySelector(`[onclick="selOpt(${qid},${i})"]`);
+  if (b) { b.classList.add('sel'); document.getElementById('b'+qid).disabled = false; }
+}
+
+function conf(qid) {
+  const q = Q.find(x => x.id === qid);
+  let ch = -1;
+  q.ops.forEach((_,i) => {
+    const b = document.querySelector(`[onclick="selOpt(${qid},${i})"]`);
+    if (b && b.classList.contains('sel')) ch = i;
+  });
+  if (ch === -1) return;
+  resp[qid] = {ch, c: q.c};
+  if (!errosCat[q.cat]) errosCat[q.cat] = {e:0, t:0};
+  errosCat[q.cat].t++;
+  if (ch !== q.c) errosCat[q.cat].e++;
+  atuPlacar();
+  renderQ();
+}
+
+function atuPlacar() {
+  const t = Object.keys(resp).length;
+  const c = Object.values(resp).filter(r => r.ch === r.c).length;
+  const e = t - c;
+  const p = t > 0 ? Math.round((c/t)*100) : 0;
+  document.getElementById('pt').textContent = t;
+  document.getElementById('pc').textContent = c;
+  document.getElementById('pe').textContent = e;
+  document.getElementById('pb').style.width = p + '%';
+  document.getElementById('pp').textContent = p + '%';
+  document.getElementById('d-t').textContent = t;
+  document.getElementById('d-c').textContent = c;
+  document.getElementById('d-e').textContent = e;
+  document.getElementById('d-p').textContent = p + '%';
+}
+
+// ═══════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════
+function renderDash() {
+  const fql = document.getElementById('fq-list');
+  const ftl = document.getElementById('ft-list');
+  const rb  = document.getElementById('rec-box');
+  const rt  = document.getElementById('rec-txt');
+
+  const cats = Object.keys(errosCat).filter(k => errosCat[k].t > 0);
+  if (!cats.length) {
+    fql.innerHTML = '<div style="font-size:.78rem;color:var(--cinza)">Responda questões para ver sua análise antifrágil.</div>';
+    ftl.innerHTML = '<div style="font-size:.78rem;color:var(--cinza)">Responda questões para ver seus pontos fortes.</div>';
+    rb.style.display = 'none'; return;
+  }
+
+  const sorted = cats.sort((a,b) => (errosCat[b].e/errosCat[b].t) - (errosCat[a].e/errosCat[a].t));
+  const fqs = sorted.filter(k => errosCat[k].e/errosCat[k].t >= 0.4);
+  const fts = sorted.filter(k => errosCat[k].e/errosCat[k].t < 0.4);
+
+  fql.innerHTML = fqs.length ? fqs.map(k => {
+    const p = Math.round(errosCat[k].e/errosCat[k].t*100);
+    return `<div class="fraqueza-item"><span class="fq-cat">${catL(k)}</span><div class="fq-bar-w"><div class="fq-bar fq-bar-r" style="width:${p}%"></div></div><span class="fq-pct fq-pct-r">${p}%</span></div>`;
+  }).join('') : '<div style="font-size:.78rem;color:var(--verde)">✅ Sem fraquezas críticas ainda.</div>';
+
+  ftl.innerHTML = fts.length ? fts.map(k => {
+    const p = Math.round((1 - errosCat[k].e/errosCat[k].t)*100);
+    return `<div class="fraqueza-item forte"><span class="fq-cat">${catL(k)}</span><div class="fq-bar-w"><div class="fq-bar fq-bar-v" style="width:${p}%"></div></div><span class="fq-pct fq-pct-v">${p}%</span></div>`;
+  }).join('') : '<div style="font-size:.78rem;color:var(--cinza)">Continue respondendo questões.</div>';
+
+  if (fqs.length) {
+    rb.style.display = 'block';
+    rt.textContent = `Foque em ${catL(fqs[0])}${fqs[1]?' e '+catL(fqs[1]):''}. Reduza a frequência em ${fts.length?catL(fts[0]):'matérias que domina'} — estude o que você erra, não o que já sabe.`;
+  } else { rb.style.display = 'none'; }
+}
+
+// ═══════════════════════════════
+// TEORIA
+// ═══════════════════════════════
+function renderT() {
+  const c = document.getElementById('tcontainer');
+  if (c.children.length) return;
+  TOPS.forEach((t,i) => {
+    const d = document.createElement('div');
+    d.className = 'top';
+    d.innerHTML = `<div class="top-h" onclick="togT(${i})"><div class="top-t"><span class="tico">${t.icon}</span>${t.title}</div><span class="tseta">▼</span></div><div class="top-b">${t.body}</div>`;
+    c.appendChild(d);
+  });
+}
+
+function togT(i) { document.querySelectorAll('.top')[i].classList.toggle('open'); }
+function catL(cat) {
+  return {papiloscopia:'Papiloscopia',penal:'Dir. Penal',processual:'Proc. Penal',constitucional:'Constitucional',administrativo:'Dir. Adm.',legislacao:'Legislação',portugues:'Português'}[cat]||cat;
+}
+
+renderQ();
+</script>
+</body>
+</html>
