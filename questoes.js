@@ -1568,7 +1568,7 @@ ops:['"Há dois dias atrás, o suspeito fugiu."',
      '"O evento ocorreu há três anos."',
      '"A três anos, a lei foi promulgada."',
      '"Há muitos anos atrás que não nos vemos."',
-     '"O crime foi cometido a exatos dez anos."],c:1,
+     '"O crime foi cometido a exatos dez anos."'],c:1,
 com:'"Há" = verbo HAVER, indica tempo decorrido: "há três anos" = três anos atrás. "A" = preposição, indica tempo futuro ou distância: "daqui a três anos". Redundâncias a evitar: "há... atrás" (tautologia — "há" já indica passado). Opção E seria correta com "há": "o crime foi cometido há exatos dez anos."'},
 
 {id:200,cat:'portugues',dif:'facil',
